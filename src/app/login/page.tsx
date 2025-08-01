@@ -1,20 +1,44 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-//import { axios } from "axios";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function SignUpPage() {
+  const router = useRouter();
   const [user, setUser] = React.useState({
     email: "",
     password: "",
   });
+  const [buttonDisabled, setButtonDisabled] = React.useState(false);
 
-  const OnLogIn = async () => {};
+  const [loading, setloading] = React.useState(false);
+
+  const OnLogIn = async () => {
+    try {
+      setloading(true);
+      const response = await axios.post("/api/users/login", user);
+      toast.success("Login success");
+      router.push("/profile");
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user.email.length > 0 && user.password.length > 0) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [user]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1 className="text-4xl">Login</h1>
+      <h1 className="text-4xl">{loading ? "Processing" : "Login"}</h1>
       <hr />
       {/* <label htmlFor="username">Username:</label>
       <input
